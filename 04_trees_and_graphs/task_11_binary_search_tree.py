@@ -104,6 +104,44 @@ class BinarySearchTree:
             return -1
         
         return max(left_height, right_height) + 1
+    
+    def delete(self, value):
+        """Удаление значения из дерева."""
+        self.root = self._delete(self.root, value)
+    
+    def _delete(self, node, value):
+        """Вспомогательный рекурсивный метод для удаления."""
+        if node is None:
+            return node
+        
+        # Поиск узла для удаления
+        if value < node.value:
+            node.left = self._delete(node.left, value)
+        elif value > node.value:
+            node.right = self._delete(node.right, value)
+        else:
+            # Узел найден. Теперь три случая:
+            
+            # Случай 1: Узел без потомков или с одним потомком
+            if node.left is None:
+                return node.right
+            elif node.right is None:
+                return node.left
+            
+            # Случай 2: Узел с двумя потомками
+            # Находим преемника (минимальный элемент в правом поддереве)
+            successor = self._find_min(node.right)
+            node.value = successor.value  # Копируем значение преемника
+            node.right = self._delete(node.right, successor.value)  # Удаляем преемника
+        
+        return node
+    
+    def _find_min(self, node):
+        """Находит минимальный элемент в поддереве."""
+        current = node
+        while current.left is not None:
+            current = current.left
+        return current
 
 
 def main():
@@ -137,7 +175,28 @@ def main():
     print(f"   4: {'найден' if bst.search(4) else 'не найден'}")
     print(f"   8: {'найден' if bst.search(8) else 'не найден'}")
     
-    # 5. Создание сбалансированного дерева для сравнения
+    # 5. ДЕМОНСТРАЦИЯ УДАЛЕНИЯ (ДОБАВЛЕННЫЙ КОД)
+    print(f"\n5. ДЕМОНСТРАЦИЯ УДАЛЕНИЯ:")
+    
+    # Удаление листа (значение 7)
+    print(f"\n   а) Удаление листа (значение 7):")
+    print(f"      До удаления: {bst.inorder()}")
+    bst.delete(7)  # Вызов метода удаления
+    print(f"      После удаления: {bst.inorder()}")
+    
+    # Удаление узла с одним потомком (значение 6)
+    print(f"\n   б) Удаление узла с одним потомком (значение 6):")
+    print(f"      До удаления: {bst.inorder()}")
+    bst.delete(6)  # Вызов метода удаления
+    print(f"      После удаления: {bst.inorder()}")
+    
+    # Проверка поиска после удалений
+    print(f"\n   в) Проверка поиска после удалений:")
+    print(f"      7: {'найден' if bst.search(7) else 'не найден'} (был удален)")
+    print(f"      6: {'найден' if bst.search(6) else 'не найден'} (был удален)")
+    print(f"      5: {'найден' if bst.search(5) else 'не найден'}")
+    
+    # 6. Создание сбалансированного дерева для сравнения
     print("\n" + "=" * 60)
     print("СРАВНЕНИЕ: СБАЛАНСИРОВАННОЕ vs НЕСБАЛАНСИРОВАННОЕ")
     print("=" * 60)
@@ -155,10 +214,16 @@ def main():
     
     # Несбалансированное дерево
     print("\nНЕСБАЛАНСИРОВАННОЕ ДЕРЕВО:")
-    print(f"   Значения: {values}")
-    print(f"   In-order: {bst.inorder()}")
+    print(f"   Исходные значения: {values}")
+    print(f"   Текущее состояние: {bst.inorder()}")
     print(f"   Сбалансировано: {'ДА' if bst.is_balanced() else 'НЕТ'}")
     
+    # Демонстрация удаления в сбалансированном дереве
+    print(f"\n   Удаление в сбалансированном дереве (значение 2):")
+    print(f"      До удаления: {balanced_bst.inorder()}")
+    balanced_bst.delete(2)
+    print(f"      После удаления: {balanced_bst.inorder()}")
+    print(f"      Сбалансировано: {'ДА' if balanced_bst.is_balanced() else 'НЕТ'}")
 
 
 if __name__ == "__main__":
